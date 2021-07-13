@@ -47,19 +47,19 @@ def main():
       APList = csv.reader(csvfile)
         
     for AP in APList:
-        if isgoodipv4(AP.ip_address):
-            get_info(AP.ip_address)
+        if isgoodipv4(AP.IPAddress):
+            get_info(AP)
 
 
-def get_info(ip):
+def get_info(AP):
     # ignore self-signed cert error
     warnings.filterwarnings(action="ignore", module=".*paramiko.*")
 
     # define username and passwords to be used to connect to APs
-    username = "admin"
-    password = getpass.getpass()
+    username = AP.Username
+    password = AP.Password
 
-    access_point = aeromiko.AP(ip, username, password)
+    access_point = aeromiko.AP(AP.IPAddress, AP.Username, AP.Password)
     access_point.connect()
 
     ap_hostname(access_point)
