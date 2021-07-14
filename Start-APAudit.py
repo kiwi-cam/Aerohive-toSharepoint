@@ -298,6 +298,7 @@ def ap_stations(access_point):
     print("Stations on this AP")
     station_table = [
         [
+            "AP Name"
             "SSID",
             "MAC",
             "IP",
@@ -318,6 +319,7 @@ def ap_stations(access_point):
     )
 
     for station in parsed_stations:
+        station["AP_Name"] = access_point.hostname
         if station["IP_ADDR"] == "0.0.0.0":
             station["IP_ADDR"] = colorize(station["IP_ADDR"], Red)
             station["Hostname"] = ""
@@ -325,6 +327,7 @@ def ap_stations(access_point):
             station["Hostname"] = socket.gethostbyaddr(station["IP_ADDR"])[0]
 
         print_columns = [
+            station["AP_Name"],
             station["SSID"],
             station["MAC_ADDR"],
             station["IP_ADDR"],
