@@ -307,7 +307,7 @@ def ap_stations(access_point):
             station["IP_ADDR"] = colorize(station["IP_ADDR"], Red)
             station["Hostname"] = ""
         else:
-            station["Hostname"] = socket.gethostbyaddr(station["IP_ADDR"]).name
+            station["Hostname"] = socket.gethostbyaddr(station["IP_ADDR"])[0]
 
         print_columns = [
             station["SSID"],
