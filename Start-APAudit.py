@@ -166,6 +166,8 @@ def ap_cpu(access_point):
     cpu_table = [["Total", access_point.cpu_total]]
     cpu_table.append(["System", access_point.cpu_system])
     cpu_table.append(["User", access_point.cpu_user])
+    
+    sharepoint_update('CPU', {"AP_Name": access_point.hostname, "CPU_Total": access_point.cpu_total, "CPU_User": access_point.cpu_user, "CPU_System": access_point.cpu_system}, "AP_Name")
 
     print(tabulate.tabulate(cpu_table, tablefmt="psql"))
     print("\n")
