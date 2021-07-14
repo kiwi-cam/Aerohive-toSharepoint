@@ -44,6 +44,19 @@ def main():
         dict_reader = DictReader(read_obj)
         # get a list of dictionaries from dct_reader
         APList = list(dict_reader)
+        
+    #Connect to Sharepoint
+    configFile = open('Sharepoint.config', 'r')
+    configLines = configFile.readlines()
+    if len(configLines) != 4:
+        print("The file Sharepoint.config needs to be created with four lines: username, password, site URL, and Sharepoint website URL")
+        sys.exit(1)
+    sharepointUsername = configLines[0]   
+    sharepointPassword = configLines[1]    
+    sharepointSite = configLines[2]    
+    website = configLines[3]
+    authcookie = Office365(website, username=sharepointUsername,password=sharepointPassword).GetCookies()    
+    site = Site(sharepointSite, version=Version.v2016, authcookie=authcookie) 
 
     for AP in APList:
         if isgoodipv4(AP['IPAddress']):
