@@ -23,16 +23,11 @@ from shareplum.site import Version
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "APListFile",
-        nargs="+",
-        help="<Required> Provide space-separated list of IP addresses",
-    )
-    args = parser.parse_args()
     if len(sys.argv) == 1:
-        parser.print_help(sys.stderr)
+        print("<Required> Provide space-separated list of IP addresses")
         sys.exit(1)
+        
+    APListFile = str(sys.argv[1])
 
     def isgoodipv4(s):
         pieces = s.split(".")
