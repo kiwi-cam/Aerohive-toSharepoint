@@ -44,9 +44,9 @@ def main():
         dict_reader = DictReader(read_obj)
         # get a list of dictionaries from dct_reader
         APList = list(dict_reader)
-        
+
     for AP in APList:
-        if isgoodipv4(AP.IPAddress):
+        if isgoodipv4(AP['IPAddress']):
             get_info(AP)
 
 
@@ -54,11 +54,7 @@ def get_info(AP):
     # ignore self-signed cert error
     warnings.filterwarnings(action="ignore", module=".*paramiko.*")
 
-    # define username and passwords to be used to connect to APs
-    username = AP.Username
-    password = AP.Password
-
-    access_point = aeromiko.AP(AP.IPAddress, AP.Username, AP.Password)
+    access_point = aeromiko.AP(AP['IPAddress'], AP['Username'], AP['Password'])
     access_point.connect()
 
     ap_hostname(access_point)
