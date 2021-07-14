@@ -11,8 +11,10 @@ import warnings
 import pprint
 import tabulate
 import os
+from office365.runtime.auth.authentication_context import AuthenticationContext
 from office365.sharepoint.client_context import ClientContext
 from office365.runtime.auth.client_credential import ClientCredential
+from office365.sharepoint.listitems.caml.caml_query import CamlQuery
 
 #                     #
 #     ## #    ####   ##    # ##
@@ -57,7 +59,9 @@ def main():
     sharepointCertPath = configLines[3].strip().format(os.path.dirname(__file__))
     sharepointSite = configLines[4].strip()
     website = configLines[5].strip()
-    ctx = ClientContext(website).with_client_certificate(sharepointTenantID, sharepointClientID, sharepointCertThumbprint, sharepointCertPath)
+    global ctx
+    authctx = AuthenticationContext(website).with_client_certificate(sharepointTenantID, sharepointClientID, sharepointCertThumbprint, sharepointCertPath)
+    ctx = ClientContext(sharepointSite, authctx)
     web = ctx.web
     ctx.load(web)
     ctx.execute_query()
@@ -169,7 +173,7 @@ def ap_cpu(access_point):
     cpu_table.append(["System", access_point.cpu_system])
     cpu_table.append(["User", access_point.cpu_user])
     
-    sharepoint_update('CPU', {"AP_Name": access_point.hostname, "CPU_Total": access_point.cpu_total, "CPU_User": access_point.cpu_user, "CPU_System": access_point.cpu_system}, "AP_Name")
+    #sharepoint_update('CPU', {"AP_Name": access_point.hostname, "CPU_Total": access_point.cpu_total, "CPU_User": access_point.cpu_user, "CPU_System": access_point.cpu_system}, "AP_Name")
 
     print(tabulate.tabulate(cpu_table, tablefmt="psql"))
     print("\n")
@@ -497,17 +501,18 @@ def sharepoint_update(listName, item, identifier):
     caml_query = CamlQuery.parse(
         "<Where><Eq><FieldRef Name="+identifier+" /><Value Type='Text'>"+item[identifier]+"</Value></Eq></Where>"
     )
-    items = list.get_items(caml_query)
+    items = SPlist.get_items(caml_query)
     ctx.load(items)
     ctx.execute_query()
     if len(items) >= 1:
         #Update the existing item
         item_to_update = items[0]
-        item_to_update.set_property(item)
+        for attr, value in item.items():
+            item_to_update.set_property(attr,value)
         item_to_update.update().execute_query()
     else:
         #Create a new Item
-        SPList.add_item(item).execute_query()
+        SPlist.add_item(item).execute_query()
         
 #                            #
 #            ## #    ####   ##    # ##
