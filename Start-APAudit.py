@@ -1,6 +1,6 @@
 import aeromiko
 import argparse
-import csv
+from csv import DictReader
 import getpass
 import natsort
 import operator
@@ -37,16 +37,13 @@ def main():
             return all(0 <= int(p) < 256 for p in pieces)
         except ValueError:
             return False
-    APList = []
-    with open(APListFile, newline='') as csvfile:
-        csv_reader = csv.reader(csvfile)
-        line_count = 0
-        for row in csv_reader:
-            if line_count == 0:
-                line_count += 1
-            else:
-                APList.append(row)
-                line_count += 1
+                
+    # open file in read mode
+    with open(APListFile, 'r') as read_obj:
+        # pass the file object to DictReader() to get the DictReader object
+        dict_reader = DictReader(read_obj)
+        # get a list of dictionaries from dct_reader
+        APList = list(dict_reader)
         
     for AP in APList:
         if isgoodipv4(AP.IPAddress):
