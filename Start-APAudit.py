@@ -50,10 +50,10 @@ def main():
     if len(configLines) != 4:
         print("The file Sharepoint.config needs to be created with four lines: clientID, ClientSecret, site URL, and Sharepoint website URL")
         sys.exit(1)   
-    sharepointClientID = configLines[0]
-    sharepointClientSecret = configLines[1]
-    sharepointSite = configLines[2]    
-    website = configLines[3]
+    sharepointClientID = configLines[0].strip()
+    sharepointClientSecret = configLines[1].strip()
+    sharepointSite = configLines[2].strip()
+    website = configLines[3].strip()
     credentials = ClientCredential(sharepointClientID, sharepointClientSecret)
     ctx = ClientContext(sharepointSite).with_credentials(credentials)
     web = ctx.web
