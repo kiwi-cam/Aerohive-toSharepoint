@@ -1,7 +1,7 @@
 import aeromiko
 import argparse
 from csv import DictReader
-import getpass
+import socket
 import natsort
 import operator
 from pyfiglet import Figlet
@@ -286,6 +286,7 @@ def ap_stations(access_point):
             "SSID",
             "MAC",
             "IP",
+            "Hostname",
             "Ch",
             "Tx Rate",
             "Rx Rate",
@@ -304,11 +305,15 @@ def ap_stations(access_point):
     for station in parsed_stations:
         if station["IP_ADDR"] == "0.0.0.0":
             station["IP_ADDR"] = colorize(station["IP_ADDR"], Red)
+            station["Hostname"] = ""
+        else:
+            station["Hostname"] = socket.gethostbyaddr(station["IP_ADDR"]).name
 
         print_columns = [
             station["SSID"],
             station["MAC_ADDR"],
             station["IP_ADDR"],
+            station["Hostname"],
             station["CHAN"],
             station["TX_RATE"],
             station["RX_RATE"],
