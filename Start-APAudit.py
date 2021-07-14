@@ -39,14 +39,14 @@ def main():
             return False
           
     with open(APListFile, newline='') as csvfile:
-      csv_reader = csv.reader(csvfile)
-      line_count = 0
-      for row in csv_reader:
-        if line_count == 0:
-          line_count += 1
+        csv_reader = csv.reader(csvfile)
+        line_count = 0
+        for row in csv_reader:
+            if line_count == 0:
+            line_count += 1
         else:
-          APList += row
-          line_count += 1
+            APList += row
+            line_count += 1
         
     for AP in APList:
         if isgoodipv4(AP.IPAddress):
