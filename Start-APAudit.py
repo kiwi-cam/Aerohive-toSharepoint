@@ -498,11 +498,12 @@ def column_colorize(print_columns, color):
 
 def sharepoint_update(listName, item, identifier):
     SPlist = ctx.web.lists.get_by_title(listName)
+    print("<Where><Eq><FieldRef Name='"+identifier+"' /><Value Type='Text'>"+item[identifier]+"</Value></Eq></Where>")
     caml_query = CamlQuery.parse(
-        "<Where><Eq><FieldRef Name="+identifier+" /><Value Type='Text'>"+item[identifier]+"</Value></Eq></Where>"
+        "<Where><Eq><FieldRef Name='"+identifier+"' /><Value Type='Text'>"+item[identifier]+"</Value></Eq></Where>"
     )
     items = SPlist.get_items(caml_query)
-    ctx.load(items)
+    ctx.load(SPlist)
     ctx.execute_query()
     if len(items) >= 1:
         #Update the existing item
