@@ -47,15 +47,16 @@ def main():
     #Connect to Sharepoint
     configFile = open('Sharepoint.config', 'r')
     configLines = configFile.readlines()
-    if len(configLines) != 4:
-        print("The file Sharepoint.config needs to be created with four lines: clientID, ClientSecret, site URL, and Sharepoint website URL")
+    if len(configLines) != 5:
+        print("The file Sharepoint.config needs to be created with five lines: TenantID, clientID, Certificate Thumbprint, Certificate path, site URL, and Sharepoint website URL")
         sys.exit(1)   
-    sharepointClientID = configLines[0].strip()
-    sharepointClientSecret = configLines[1].strip()
-    sharepointSite = configLines[2].strip()
-    website = configLines[3].strip()
-    credentials = ClientCredential(sharepointClientID, sharepointClientSecret)
-    ctx = ClientContext(sharepointSite).with_credentials(credentials)
+    sharepointTenantID = configLines[0].strip()
+    sharepointClientID = configLines[1].strip()
+    sharepointCertThumbprint = configLines[1].strip()
+    sharepointCertPath = configLines[2].strip()
+    sharepointSite = configLines[3].strip()
+    website = configLines[4].strip()
+    ctx = ClientContext(sharepointSite).with_certificate(sharepointTenantID, sharepointClientID, sharepointCertThumbprint, sharepointCertPath)
     web = ctx.web
     ctx.load(web)
     ctx.execute_query()
