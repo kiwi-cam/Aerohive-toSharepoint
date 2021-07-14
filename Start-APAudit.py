@@ -10,9 +10,8 @@ import sys
 import warnings
 import pprint
 import tabulate
-from shareplum import Site    
-from shareplum import Office365    
-from shareplum.site import Version  
+from office365.sharepoint.client_context import ClientContext
+from office365.runtime.auth.client_credential import ClientCredential
 
 #                     #
 #     ## #    ####   ##    # ##
@@ -49,14 +48,17 @@ def main():
     configFile = open('Sharepoint.config', 'r')
     configLines = configFile.readlines()
     if len(configLines) != 4:
-        print("The file Sharepoint.config needs to be created with four lines: username, password, site URL, and Sharepoint website URL")
-        sys.exit(1)
-    sharepointUsername = configLines[0]   
-    sharepointPassword = configLines[1]    
+        print("The file Sharepoint.config needs to be created with four lines: clientID, ClientSecret, site URL, and Sharepoint website URL")
+        sys.exit(1)   
+    sharepointClientID = configLines[0]
+    sharepointClientSecret = configLines[1]
     sharepointSite = configLines[2]    
     website = configLines[3]
-    authcookie = Office365(website, username=sharepointUsername,password=sharepointPassword).GetCookies()    
-    site = Site(sharepointSite, version=Version.v2016, authcookie=authcookie) 
+    credentials = ClientCredential(sharepointClientID, sharepointClientSecret)
+    ctx = ClientContext(sharepointSite).with_credentials(credentials)
+    web = ctx.web
+    ctx.load(web)
+    ctx.execute_query()
 
     for AP in APList:
         if isgoodipv4(AP['IPAddress']):
@@ -344,6 +346,7 @@ def ap_stations(access_point):
         elif station["CHAN"] == w1_channel:
             print_columns = column_colorize(print_columns, Blue)
 
+        sharepoint_update('Stations', station, "MAC_ADDR")
         station_table.append(print_columns)
 
     print(tabulate.tabulate(station_table, headers="firstrow", tablefmt="psql"))
@@ -479,7 +482,23 @@ def column_colorize(print_columns, color):
         new_columns.append(new_column)
     return new_columns
 
-
+def sharepoint_update(listName, item, identifier):
+    SPlist = ctx.web.lists.get_by_title(listName)
+    caml_query = CamlQuery.parse(
+        "<Where><Eq><FieldRef Name="+identifier+" /><Value Type='Text'>"+item[identifier]+"</Value></Eq></Where>"
+    )
+    items = list.get_items(caml_query)
+    ctx.load(items)
+    ctx.execute_query()
+    if len(items) >= 1:
+        #Update the existing item
+        item_to_update = items[0]
+        item_to_update.set_property(item)
+        item_to_update.update().execute_query()
+    else:
+        #Create a new Item
+        SPList.add_item(item).execute_query()
+        
 #                            #
 #            ## #    ####   ##    # ##
 #            # # #  #   #    #    ##  #
