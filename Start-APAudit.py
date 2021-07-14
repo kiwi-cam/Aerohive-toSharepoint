@@ -190,7 +190,7 @@ def ap_channels(access_point):
             key = key.lower()
             setattr(access_point, key, value)
 
-    channels_table = [["Int", "CH", "TX Power"]]
+    channels_table = [["AP Name", "Int", "CH", "TX Power"]]
 
     for radio in ("wifi0", "wifi1"):
         # use getattr cause string + variable concat getting used as var name
@@ -214,7 +214,7 @@ def ap_channels(access_point):
         chan = colorize(getattr(access_point, primary_channel), color)
         txpower = colorize(getattr(access_point, radio + "_tx_power_dbm"), color)
 
-        channels_table.append([interface, chan, txpower])
+        channels_table.append([access_point.hostname, interface, chan, txpower])
 
     print(tabulate.tabulate(channels_table, headers="firstrow", tablefmt="psql"))
     print("* denotes manual setting")
@@ -234,7 +234,7 @@ def ap_neighbors(access_point):
     bssid_list = []
 
     neighbor_table = []
-    neighbor_table.append(["BSSID", "CH", "RSSI", "SSID", "CU", "CRC", "STA"])
+    neighbor_table.append(["AP Name", "BSSID", "CH", "RSSI", "SSID", "CU", "CRC", "STA"])
 
     parsed_neighbors.sort(key=operator.itemgetter("RSSI"))
     parsed_neighbors = natsort.natsorted(
@@ -249,6 +249,8 @@ def ap_neighbors(access_point):
 
             # only show neighbors that we have to share airtime with
             if int(neighbor["RSSI"]) >= -85:
+                
+                neighbor["AP_Name"] = access_point.hostname
 
                 # copy radio channel so we can decorate the copy and still
                 #   use the original for comparison with neighboring APs
@@ -262,6 +264,7 @@ def ap_neighbors(access_point):
 
                 # columns to be output into table
                 print_columns = [
+                    neighbor["AP_Name"],
                     neighbor["BSSID"],
                     neighbor["DECORATED_CHANNEL"],
                     neighbor["RSSI"],
