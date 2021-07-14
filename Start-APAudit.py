@@ -37,16 +37,16 @@ def main():
             return all(0 <= int(p) < 256 for p in pieces)
         except ValueError:
             return False
-          
+    APList = []
     with open(APListFile, newline='') as csvfile:
         csv_reader = csv.reader(csvfile)
         line_count = 0
         for row in csv_reader:
             if line_count == 0:
-            line_count += 1
-        else:
-            APList += row
-            line_count += 1
+                line_count += 1
+            else:
+                APList.append(row)
+                line_count += 1
         
     for AP in APList:
         if isgoodipv4(AP.IPAddress):
