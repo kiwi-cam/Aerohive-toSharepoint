@@ -298,7 +298,7 @@ def ap_stations(access_point):
     print("Stations on this AP")
     station_table = [
         [
-            "AP Name"
+            "AP Name",
             "SSID",
             "MAC",
             "IP",
