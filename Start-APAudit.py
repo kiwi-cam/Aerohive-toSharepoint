@@ -10,6 +10,7 @@ import sys
 import warnings
 import pprint
 import tabulate
+import os
 from office365.sharepoint.client_context import ClientContext
 from office365.runtime.auth.client_credential import ClientCredential
 
@@ -47,16 +48,16 @@ def main():
     #Connect to Sharepoint
     configFile = open('Sharepoint.config', 'r')
     configLines = configFile.readlines()
-    if len(configLines) != 5:
+    if len(configLines) != 6:
         print("The file Sharepoint.config needs to be created with five lines: TenantID, clientID, Certificate Thumbprint, Certificate path, site URL, and Sharepoint website URL")
         sys.exit(1)   
     sharepointTenantID = configLines[0].strip()
     sharepointClientID = configLines[1].strip()
-    sharepointCertThumbprint = configLines[1].strip()
-    sharepointCertPath = configLines[2].strip()
-    sharepointSite = configLines[3].strip()
-    website = configLines[4].strip()
-    ctx = ClientContext(sharepointSite).with_certificate(sharepointTenantID, sharepointClientID, sharepointCertThumbprint, sharepointCertPath)
+    sharepointCertThumbprint = configLines[2].strip()
+    sharepointCertPath = configLines[3].strip().format(os.path.dirname(__file__))
+    sharepointSite = configLines[4].strip()
+    website = configLines[5].strip()
+    ctx = ClientContext(website).with_client_certificate(sharepointTenantID, sharepointClientID, sharepointCertThumbprint, sharepointCertPath)
     web = ctx.web
     ctx.load(web)
     ctx.execute_query()
