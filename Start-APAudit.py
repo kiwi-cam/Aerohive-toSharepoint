@@ -121,6 +121,7 @@ def ap_hostname(access_point):
         # remove spaces immediately following numbers
         access_point.uptime = re.sub(r"(\d+) ", r"\1", access_point.uptime)
         # print model number and uptime
+        sharepoint_update('AccessPoints', {"AP_Name": access_point.hostname, "Model": access_point.platform, "Uptime": access_point.uptime}, "<Where><Eq><FieldRef Name='AP_Name' /><Value Type='Text'>"+access_point.hostname+"</Value></Eq></Where>")
         if not silent: print("\nModel: " + colorize(access_point.platform, Cyan))
         if not silent: print("Uptime: " + colorize(access_point.uptime, Cyan))
 
@@ -178,7 +179,7 @@ def ap_cpu(access_point):
     cpu_table.append(["System", access_point.cpu_system])
     cpu_table.append(["User", access_point.cpu_user])
     
-    sharepoint_update('CPU', {"AP_Name": access_point.hostname, "CPU_Total": access_point.cpu_total, "CPU_User": access_point.cpu_user, "CPU_System": access_point.cpu_system}, "<Where><Eq><FieldRef Name='AP_Name' /><Value Type='Text'>"+access_point.hostname+"</Value></Eq></Where>")
+    sharepoint_update('AccessPoints', {"AP_Name": access_point.hostname, "CPU_Total": access_point.cpu_total, "CPU_User": access_point.cpu_user, "CPU_System": access_point.cpu_system}, "<Where><Eq><FieldRef Name='AP_Name' /><Value Type='Text'>"+access_point.hostname+"</Value></Eq></Where>")
 
     if not silent: print(tabulate.tabulate(cpu_table, tablefmt="psql"))
     if not silent: print("\n")
@@ -228,6 +229,7 @@ def ap_channels(access_point):
         txpower = colorize(getattr(access_point, radio + "_tx_power_dbm"), color)
 
         channels_table.append([access_point.hostname, interface, chan, txpower])
+        sharepoint_update('AccessPoints', {"AP_Name": access_point.hostname, interface+"_Channel": chan, interface+"_TX_Power": txpower}, "<Where><Eq><FieldRef Name='AP_Name' /><Value Type='Text'>"+access_point.hostname+"</Value></Eq></Where>")
 
     if not silent: print(tabulate.tabulate(channels_table, headers="firstrow", tablefmt="psql"))
     if not silent: print("* denotes manual setting")
@@ -458,6 +460,7 @@ def ap_radios(access_point):
                 "",
             ],
         ]
+        sharepoint_update('AccessPoints', {"AP_Name": access_point.hostname, radio+"_RX_Bytes": AP_info("rx_bytes"), radio+"_TX_Bytes": AP_info("tx_bytes"), radio+"_RX_Drops": percent("rx_drops", "rx_packets"), radio+"_TX_Drops": percent("tx_drops", "tx_packets"), radio+"_RX_Errors": percent("rx_err", "rx_packets"), radio+"_TX_Errors": percent("rx_err", "rx_packets")}, "<Where><Eq><FieldRef Name='AP_Name' /><Value Type='Text'>"+access_point.hostname+"</Value></Eq></Where>")
         if not silent: print("\n" + tabulate.tabulate(data_table, headers="firstrow", tablefmt="psql"))
 
 
