@@ -229,7 +229,7 @@ def ap_channels(access_point):
         txpower = colorize(getattr(access_point, radio + "_tx_power_dbm"), color)
 
         channels_table.append([access_point.hostname, interface, chan, txpower])
-        sharepoint_update('AccessPoints', {"AP_Name": access_point.hostname, interface+"_Channel": chan, interface+"_TX_Power": txpower}, "<Where><Eq><FieldRef Name='AP_Name' /><Value Type='Text'>"+access_point.hostname+"</Value></Eq></Where>")
+        sharepoint_update('AccessPoints', {"AP_Name": access_point.hostname, getattr(access_point, radio + "_interface")+"_Channel": chan, getattr(access_point, radio + "_interface")+"_TX_Power": txpower}, "<Where><Eq><FieldRef Name='AP_Name' /><Value Type='Text'>"+access_point.hostname+"</Value></Eq></Where>")
 
     if not silent: print(tabulate.tabulate(channels_table, headers="firstrow", tablefmt="psql"))
     if not silent: print("* denotes manual setting")
