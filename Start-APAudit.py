@@ -16,6 +16,9 @@ from office365.sharepoint.client_context import ClientContext
 from office365.runtime.auth.client_credential import ClientCredential
 from office365.sharepoint.listitems.caml.caml_query import CamlQuery
 
+# Set to True if you'd like no local output
+silent = False 
+
 #                     #
 #     ## #    ####   ##    # ##
 #     # # #  #   #    #    ##  #
@@ -100,8 +103,8 @@ def ap_hostname(access_point):
         access_point.hostname = access_point.get_hostname()
         # print hostname with Figlet and plain text
         figlet = Figlet(font="big")
-        print(colorize(figlet.renderText(access_point.hostname), Cyan))
-        print(colorize(access_point.hostname, Cyan))
+        if not silent: print(colorize(figlet.renderText(access_point.hostname), Cyan))
+        if not silent: print(colorize(access_point.hostname, Cyan))
 
         # get model# and uptime info via Aeromiko
         version_info = access_point.show_version()
@@ -118,32 +121,34 @@ def ap_hostname(access_point):
         # remove spaces immediately following numbers
         access_point.uptime = re.sub(r"(\d+) ", r"\1", access_point.uptime)
         # print model number and uptime
-        print("\nModel: " + colorize(access_point.platform, Cyan))
-        print("Uptime: " + colorize(access_point.uptime, Cyan))
+        if not silent: print("\nModel: " + colorize(access_point.platform, Cyan))
+        if not silent: print("Uptime: " + colorize(access_point.uptime, Cyan))
 
         # get lldp information via Aeromiko
         lldp_info = access_point.show_lldp_neighbor()
         access_point.lldp_neighbor = lldp_info["SYSTEM_NAME"]
         access_point.lldp_neighbor_port = lldp_info["PORT_DESC"]
         # print port and system descriptions
-        print(
-            "\nport "
-            + colorize(access_point.lldp_neighbor_port, Magenta)
-            + " on "
-            + colorize(access_point.lldp_neighbor, Magenta)
-        )
+        if not silent:
+            print(
+                "\nport "
+                + colorize(access_point.lldp_neighbor_port, Magenta)
+                + " on "
+                + colorize(access_point.lldp_neighbor, Magenta)
+            )
 
         # get eth0 information via Aeromiko
         eth0_info = access_point.show_int_eth("eth0")
         access_point.link_duplex = eth0_info["DUPLEX"]
         access_point.link_speed = eth0_info["SPEED"]
         # print link speed and duplex
-        print(
-            colorize(access_point.link_speed, Magenta)
-            + ", "
-            + colorize(access_point.link_duplex, Magenta)
-            + "\n\n"
-        )
+        if not silent:
+            print(
+                colorize(access_point.link_speed, Magenta)
+                + ", "
+                + colorize(access_point.link_duplex, Magenta)
+                + "\n\n"
+            )
     except IndexError:
         pass
 
@@ -159,7 +164,7 @@ def ap_hostname(access_point):
 def ap_cpu(access_point):
     snapshot_cpu = access_point.show_cpu()
 
-    print("Snapshot CPU Util")
+    if not silent: print("Snapshot CPU Util")
 
     access_point.cpu_total = snapshot_cpu["CPU_TOTAL"]
     if float(access_point.cpu_total) > 75:
@@ -173,10 +178,10 @@ def ap_cpu(access_point):
     cpu_table.append(["System", access_point.cpu_system])
     cpu_table.append(["User", access_point.cpu_user])
     
-    #sharepoint_update('CPU', {"AP_Name": access_point.hostname, "CPU_Total": access_point.cpu_total, "CPU_User": access_point.cpu_user, "CPU_System": access_point.cpu_system}, "AP_Name")
+    sharepoint_update('CPU', {"AP_Name": access_point.hostname, "CPU_Total": access_point.cpu_total, "CPU_User": access_point.cpu_user, "CPU_System": access_point.cpu_system}, "<Where><Eq><FieldRef Name='AP_Name' /><Value Type='Text'>"+access_point.hostname+"</Value></Eq></Where>")
 
-    print(tabulate.tabulate(cpu_table, tablefmt="psql"))
-    print("\n")
+    if not silent: print(tabulate.tabulate(cpu_table, tablefmt="psql"))
+    if not silent: print("\n")
 
     #            #                                   ##
     #            #                                    #
@@ -224,8 +229,8 @@ def ap_channels(access_point):
 
         channels_table.append([access_point.hostname, interface, chan, txpower])
 
-    print(tabulate.tabulate(channels_table, headers="firstrow", tablefmt="psql"))
-    print("* denotes manual setting")
+    if not silent: print(tabulate.tabulate(channels_table, headers="firstrow", tablefmt="psql"))
+    if not silent: print("* denotes manual setting")
 
     #                    #           #      #
     #                                #      #
@@ -249,7 +254,7 @@ def ap_neighbors(access_point):
         parsed_neighbors, key=operator.itemgetter("CHANNEL")
     )
 
-    print("\n\nACSP Neighbors >= -85dBm")
+    if not silent: print("\n\nACSP Neighbors >= -85dBm")
     for neighbor in parsed_neighbors:
         # if BBSID !unique, drop it
         if neighbor["BSSID"] not in bssid_list:
@@ -291,9 +296,10 @@ def ap_neighbors(access_point):
                     print_columns = column_colorize(print_columns, Blue)
 
                 neighbor_table.append(print_columns)
+                sharepoint_update('Neighbors', neighbor, "<Where><And><Eq><FieldRef Name='AP_Name' /><Value Type='Text'>"+neighbor["AP_Name"]+"</Value></Eq><Eq><FieldRef Name='BSSID' /><Value Type='Text'>"+neighbor["BSSID"]+"</Value></Eq></And></Where>")
 
-    print(tabulate.tabulate(neighbor_table, headers="firstrow", tablefmt="psql"))
-    print("\n")
+    if not silent: print(tabulate.tabulate(neighbor_table, headers="firstrow", tablefmt="psql"))
+    if not silent: print("\n")
 
     #              #             #      #
     #              #             #
@@ -306,7 +312,7 @@ def ap_neighbors(access_point):
 
 def ap_stations(access_point):
     parsed_stations = access_point.show_station()
-    print("Stations on this AP")
+    if not silent: print("Stations on this AP")
     station_table = [
         [
             "AP Name",
@@ -360,10 +366,10 @@ def ap_stations(access_point):
         elif station["CHAN"] == w1_channel:
             print_columns = column_colorize(print_columns, Blue)
 
-        sharepoint_update('Stations', station, "MAC_ADDR")
+        sharepoint_update('Stations', station, "<Where><Eq><FieldRef Name='MAC_ADDR' /><Value Type='Text'>"+station["MAC_ADDR"]+"</Value></Eq></Where>")
         station_table.append(print_columns)
 
-    print(tabulate.tabulate(station_table, headers="firstrow", tablefmt="psql"))
+    if not silent: print(tabulate.tabulate(station_table, headers="firstrow", tablefmt="psql"))
 
     #                       #    #
     #                       #
@@ -452,7 +458,7 @@ def ap_radios(access_point):
                 "",
             ],
         ]
-        print("\n" + tabulate.tabulate(data_table, headers="firstrow", tablefmt="psql"))
+        if not silent: print("\n" + tabulate.tabulate(data_table, headers="firstrow", tablefmt="psql"))
 
 
 #                    ##                    #
@@ -496,12 +502,9 @@ def column_colorize(print_columns, color):
         new_columns.append(new_column)
     return new_columns
 
-def sharepoint_update(listName, item, identifier):
+def sharepoint_update(listName, item, dupQuery):
     SPlist = ctx.web.lists.get_by_title(listName)
-    print("<Where><Eq><FieldRef Name='"+identifier+"' /><Value Type='Text'>"+item[identifier]+"</Value></Eq></Where>")
-    caml_query = CamlQuery.parse(
-        "<Where><Eq><FieldRef Name='"+identifier+"' /><Value Type='Text'>"+item[identifier]+"</Value></Eq></Where>"
-    )
+    caml_query = CamlQuery.parse(dupQuery)
     items = SPlist.get_items(caml_query)
     ctx.load(SPlist)
     ctx.execute_query()
