@@ -1,0 +1,6 @@
+aeromiko
+natsort
+pyfiglet
+tabulate
+Office365-REST-Python-Client
+pyjwt[crypto]
