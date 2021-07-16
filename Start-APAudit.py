@@ -25,10 +25,22 @@ from office365.sharepoint.listitems.caml.caml_query import CamlQuery
 
 def main():
     if len(sys.argv) == 1:
-        print("<Required> Provide space-separated list of IP addresses")
+        print("This script requires two arguments:")
+        print("<Required> an APList file path. A csv file with a list of APs including Hostname,IPAddress,Username,Password")
+        print("<Required> a Sharepoint Config file path. A plain text file with these details on each line, in order: AzureTenantID, AzureClientID, CertificateThumbprint, Private Key path, SiteURL, (optional)TenantRootURL")
         sys.exit(1)
         
-    APListFile = str(sys.argv[1])
+    APListFile = str(sys.argv[1]).strip()
+    #Test Path is Valid
+    if not os.path.isfile(APListFile):
+        print("<Invalid> The supplied csv file needs to contain a list of APs including Hostname,IPAddress,Username,Password (comma seperated)")
+        sys.exit(1)
+
+    sharepointConfigFile = str(sys.argv[2]).strip()
+    #Test Path is Valid
+    if not os.path.isfile(sharepointConfigFile):
+        print("<Invalid> a Sharepoint Config file path is required. A plain text file with these details on each line, in order: AzureTenantID, AzureClientID, CertificateThumbprint, Private Key path, SiteURL, (optional)TenantRootURL")
+        sys.exit(1)
 
     def isgoodipv4(s):
         pieces = s.split(".")
@@ -47,17 +59,20 @@ def main():
         APList = list(dict_reader)
         
     #Connect to Sharepoint
-    configFile = open('Sharepoint.config', 'r')
+    configFile = open(sharepointConfigFile, 'r')
     configLines = configFile.readlines()
-    if len(configLines) != 6:
-        print("The file Sharepoint.config needs to be created with five lines: TenantID, clientID, Certificate Thumbprint, Certificate path, site URL, and Sharepoint website URL")
+    if len(configLines) < 5 or len(configLines) > 6:
+        print("The file Sharepoint.config needs to be created with five or six lines: TenantID, clientID, Certificate Thumbprint, Certificate path, site URL, and Sharepoint website URL")
         sys.exit(1)   
     sharepointTenantID = configLines[0].strip()
     sharepointClientID = configLines[1].strip()
     sharepointCertThumbprint = configLines[2].strip()
     sharepointCertPath = configLines[3].strip().format(os.path.dirname(__file__))
     sharepointSite = configLines[4].strip()
-    website = configLines[5].strip()
+    if configLines[5]:
+        website = configLines[5].strip()
+    else:
+        website = configLines[4].strip()
     global ctx
     authctx = AuthenticationContext(website).with_client_certificate(sharepointTenantID, sharepointClientID, sharepointCertThumbprint, sharepointCertPath)
     ctx = ClientContext(sharepointSite, authctx)
