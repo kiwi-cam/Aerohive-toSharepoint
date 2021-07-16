@@ -25,6 +25,7 @@ AP-HALLWAY,192.168.1.24,admin,xxxx
 ## Setup Sharepoint Lists/Fields
 
 ### List 'Stations'
+```
 InternalName              TypeDisplayName
 ------------              ---------------
 AP_Name                   Single line of text
@@ -52,8 +53,10 @@ SM_PS                     Single line of text
 CHAN_WIDTH                Single line of text
 MUMIMO                    Single line of text
 RELEASE                   Single line of text
+```
 
 ### List 'AccessPoints'
+```
 InternalName              TypeDisplayName
 ------------              ---------------
 AP_Name                   Single line of text
@@ -78,8 +81,10 @@ wifi0_RX_Errors           Single line of text
 wifi0_TX_Errors           Single line of text
 wifi1_RX_Errors           Single line of text
 wifi1_TX_Errors           Single line of text
+```
 
 ### List 'Neighbors'
+```
 InternalName              TypeDisplayName
 ------------              ---------------
 AP_Name                   Single line of text
@@ -94,3 +99,4 @@ CHANNEL                   Single line of text
 AEROHIVE                  Single line of text
 CHANNEL_WIDTH             Single line of text
 DECORATED_CHANNEL         Single line of text
+```
