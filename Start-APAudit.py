@@ -15,9 +15,6 @@ from office365.sharepoint.client_context import ClientContext
 from office365.runtime.auth.client_credential import ClientCredential
 from office365.sharepoint.listitems.caml.caml_query import CamlQuery
 
-# Set to True if you'd like no local output
-silent = False 
-
 #                     #
 #     ## #    ####   ##    # ##
 #     # # #  #   #    #    ##  #
@@ -107,6 +104,7 @@ def get_info(AP):
     # get Radio information
     access_point = ap_radios(access_point)
 
+    print(str(access_point))
     sharepoint_update('AccessPoints', 
          {
              "AP_Name": access_point.hostname, 
