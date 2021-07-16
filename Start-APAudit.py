@@ -1,5 +1,4 @@
 import aeromiko
-import argparse
 from csv import DictReader
 import socket
 import natsort
@@ -8,7 +7,6 @@ from pyfiglet import Figlet
 import re
 import sys
 import warnings
-import pprint
 import os
 from office365.runtime.auth.authentication_context import AuthenticationContext
 from office365.sharepoint.client_context import ClientContext
@@ -64,6 +62,8 @@ def main():
     if len(configLines) < 5 or len(configLines) > 6:
         print("The file Sharepoint.config needs to be created with five or six lines: TenantID, clientID, Certificate Thumbprint, Certificate path, site URL, and Sharepoint website URL")
         sys.exit(1)   
+
+    print("Connecting to Sharepoint...")
     sharepointTenantID = configLines[0].strip()
     sharepointClientID = configLines[1].strip()
     sharepointCertThumbprint = configLines[2].strip()
@@ -82,12 +82,14 @@ def main():
 
     for AP in APList:
         if isgoodipv4(AP['IPAddress']):
+            print("Processing AP "+AP['Hostname'])
             get_info(AP)
 
 
 def get_info(AP):
     # ignore self-signed cert error
     warnings.filterwarnings(action="ignore", module=".*paramiko.*")
+    print("\tGetting AP Information")
 
     access_point = aeromiko.AP(AP['IPAddress'], AP['Username'], AP['Password'])
     access_point.connect()
@@ -119,7 +121,6 @@ def get_info(AP):
     # get Radio information
     access_point = ap_radios(access_point)
 
-    print(str(access_point))
     sharepoint_update('AccessPoints', 
          {
              "AP_Name": access_point.hostname, 
@@ -148,7 +149,9 @@ def get_info(AP):
          "<Where><Eq><FieldRef Name='AP_Name' /><Value Type='Text'>"+access_point.hostname+"</Value></Eq></Where>"
     )
 
+    print("\tGetting Neighbors")
     ap_neighbors(access_point)
+    print("\tGetting Stations")
     ap_stations(access_point)
 
 
