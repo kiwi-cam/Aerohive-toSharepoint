@@ -82,14 +82,14 @@ def main():
 
     for AP in APList:
         if isgoodipv4(AP['IPAddress']):
-            print("Processing AP "+AP['Hostname'])
+            print("Processing AP "+AP['Hostname']+"...")
             get_info(AP)
 
 
 def get_info(AP):
     # ignore self-signed cert error
     warnings.filterwarnings(action="ignore", module=".*paramiko.*")
-    print("\tGetting AP Information")
+    print("\tGetting AP details")
 
     access_point = aeromiko.AP(AP['IPAddress'], AP['Username'], AP['Password'])
     access_point.connect()
