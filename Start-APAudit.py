@@ -253,22 +253,6 @@ def ap_neighbors(access_point):
 
 def ap_stations(access_point):
     parsed_stations = access_point.show_station()
-    station_table = [
-        [
-            "AP Name",
-            "SSID",
-            "MAC",
-            "IP",
-            "Hostname",
-            "Ch",
-            "Tx Rate",
-            "Rx Rate",
-            "Pow(SNR)",
-            "Assoc",
-            "PHY",
-            "State",
-        ]
-    ]
 
     parsed_stations.sort(key=operator.itemgetter("MAC_ADDR"))
     parsed_stations = natsort.natsorted(
@@ -277,9 +261,7 @@ def ap_stations(access_point):
 
     for station in parsed_stations:
         station["AP_Name"] = access_point.hostname
-        if station["IP_ADDR"] == "0.0.0.0":
-            station["Hostname"] = ""
-        else:
+        if station["IP_ADDR"] != "0.0.0.0":
             station["Hostname"] = socket.gethostbyaddr(station["IP_ADDR"])[0]
 
         w0_channel = re.sub("[*]", "", access_point.wifi0_primary_channel)
