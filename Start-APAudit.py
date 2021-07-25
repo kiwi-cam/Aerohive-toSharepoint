@@ -293,10 +293,13 @@ def ap_radios(access_point):
             return getattr(access_point, radio + "_" + info)
 
         def percent(numerator, denominator):
-            answer = int(AP_info(numerator)) / int(AP_info(denominator))
-            rounded = round(answer, 2)
-            stringified = str(rounded) + "%"
-            return stringified
+            if int(AP_info(denominator)) > 0:
+                answer = int(AP_info(numerator)) / int(AP_info(denominator))
+                rounded = round(answer, 2)
+                stringified = str(rounded) + "%"
+                return stringified
+            else:
+                return "-"
 
         setattr(access_point, radio+"_RX_Drops", percent("rx_drops", "rx_packets")) 
         setattr(access_point, radio+"_TX_Drops", percent("tx_drops", "tx_packets")) 
