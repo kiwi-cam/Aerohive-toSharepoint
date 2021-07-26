@@ -53,7 +53,6 @@ SM_PS                     Single line of text
 CHAN_WIDTH                Single line of text
 MUMIMO                    Single line of text
 RELEASE                   Single line of text
-Timestamp                 Date and Time
 ```
 
 ### List 'AccessPoints'
