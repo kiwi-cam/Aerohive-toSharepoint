@@ -8,7 +8,6 @@ import re
 import sys
 import warnings
 import os
-from time import gmtime, strftime
 from office365.runtime.auth.authentication_context import AuthenticationContext
 from office365.sharepoint.client_context import ClientContext
 from office365.runtime.auth.client_credential import ClientCredential
@@ -262,7 +261,6 @@ def ap_stations(access_point):
 
     for station in parsed_stations:
         station["AP_Name"] = access_point.hostname
-        station["Timestamp"] = strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
         if station["IP_ADDR"] != "0.0.0.0":
             station["Hostname"] = socket.gethostbyaddr(station["IP_ADDR"])[0]
 
