@@ -262,7 +262,10 @@ def ap_stations(access_point):
     for station in parsed_stations:
         station["AP_Name"] = access_point.hostname
         if station["IP_ADDR"] != "0.0.0.0":
-            station["Hostname"] = socket.gethostbyaddr(station["IP_ADDR"])[0]
+            try:
+                station["Hostname"] = socket.gethostbyaddr(station["IP_ADDR"])[0]
+            except:
+                print("\t-Could not resolve IP "+station["IP_ADDR"])
 
         w0_channel = re.sub("[*]", "", access_point.wifi0_primary_channel)
         w1_channel = re.sub("[*]", "", access_point.wifi1_primary_channel)
